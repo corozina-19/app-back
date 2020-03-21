@@ -1,0 +1,20 @@
+# Local files
+corozina/settings_local.py
+corozina/static/*
+*.pyc
+.idea/*
+settings_local.py
+sources/
+source/
+docs/
+*.pyc
+.idea/*
+*.sqlite3
+*.seg
+*.toc
+*.log
+local_urls.py
+venv
+*.db
+/media/*
+
