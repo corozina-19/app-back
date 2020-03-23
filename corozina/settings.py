@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'diagnosis',
-    'firebase'
+    'firebase',
+    'chat'
 ]
 
 MIDDLEWARE = [
