@@ -14,13 +14,13 @@ class PushNotificationsFirebaseManager(object):
 
     def __init__(self, url_fcm=None, key=None, *args, **kwargs):
         self.url_fmc = url_fcm if url_fcm else settings.URL_FCM
-        self.key = key if key else settings.NOTIFICATIONS_ZINA_FIREBASE_TOKEN
+        self.key = key if key else settings.NOTIFICATIONS_FIREBASE_TOKEN
 
     def __str__(self):
         return f'server_url: {self.url_fcm} server_key:{self.key}'
 
     def __repr__(self):
-        return f"{self.__class__.__name__}('{settings.URL_FCM}', '{settings.NOTIFICATIONS_ZINA_FIREBASE_TOKEN}')"
+        return f"{self.__class__.__name__}('{settings.URL_FCM}', '{settings.NOTIFICATIONS_FIREBASE_TOKEN}')"
 
     def send(self, to: str, title: str, body: str, collapse_key: str = 'type_a', *args, **data: dict) -> requests:
         """

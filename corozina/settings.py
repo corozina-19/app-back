@@ -157,7 +157,7 @@ MEDIA_URL = '/media/'
 
 # SETTINGS firebase
 URL_FCM = ''
-NOTIFICATIONS_ZINA_FIREBASE_TOKEN = ''
+NOTIFICATIONS_FIREBASE_TOKEN = ''
 
 try:
     exec(open(os.path.join(BASE_DIR, 'corozina/settings_local.py')).read())
