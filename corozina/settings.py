@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'diagnosis',
+    'firebase'
 ]
 
 MIDDLEWARE = [
@@ -153,6 +154,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static-server', 'static-root')
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static-server', 'media-root')#'/home/dark/practicas/ApiRest/'
 MEDIA_URL = '/media/'
+
+# SETTINGS firebase
+URL_FCM = ''
+NOTIFICATIONS_ZINA_FIREBASE_TOKEN = ''
 
 try:
     exec(open(os.path.join(BASE_DIR, 'corozina/settings_local.py')).read())
