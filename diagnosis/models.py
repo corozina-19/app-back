@@ -6,17 +6,21 @@ from diagnosis.constants import QUESTION_TYPE, YES_NO_QUESTION
 class Survey(models.Model):
     name = models.CharField(max_length=50)
     percentage_acceptance = models.FloatField(default=0)
+    total_score = models.IntegerField(default=0)
 
 
 class Question(models.Model):
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="questions")
     type = models.IntegerField(choices=QUESTION_TYPE, default=YES_NO_QUESTION)
+    statement = models.CharField(max_length=255)
+    position = models.IntegerField(default=0)
 
 
-class QuestionOptions(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+class QuestionOption(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="options")
     value = models.IntegerField(default=0)
     text = models.CharField(max_length=150)
+    position = models.IntegerField(default=0)
 
 
 class Diagnosis(models.Model):
@@ -24,6 +28,9 @@ class Diagnosis(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
     score_percentage = models.FloatField(default=0)
+
+    class Meta:
+        verbose_name_plural = "Diagnoses"
 
 
 class Answer(models.Model):
