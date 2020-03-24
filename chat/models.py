@@ -6,16 +6,16 @@ class Thread(models.Model):
     """Model used to manage a chat thread"""
 
     STATUS_CHOICES = (
-        (0, 'Open'),
-        (1, 'Take'),
-        (2, 'Closed'),
+        ('open', 'Open'),
+        ('taken', 'Taken'),
+        ('closed', 'Closed'),
     )
 
     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient')
     doctor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='doctor')
     creation_date = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(choices=STATUS_CHOICES)
+    status = models.CharField(choices=STATUS_CHOICES, default='open', max_length=25)
 
     def __str__(self):
         return f'status: {self.get_status_display} user: {self.user.get_full_name()} ' \
