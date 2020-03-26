@@ -3,5 +3,5 @@ from django.urls import path, include
 
 urlpatterns = [
     # path('', views.test_job_generator, name='index'),
-    path('api/', include('diagnosis.api.urls')),
+    path('diagnosis/', include('diagnosis.api.urls')),
 ]

@@ -154,6 +154,10 @@ MEDIA_URL = '/media/'
 URL_FCM = ''
 NOTIFICATIONS_FIREBASE_TOKEN = ''
 
+
+# API settings
+CURRENT_API_VERSION = 'v1'
+
 try:
     exec(open(os.path.join(BASE_DIR, 'corozina/settings_local.py')).read())
 except IOError:
