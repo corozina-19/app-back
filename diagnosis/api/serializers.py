@@ -15,7 +15,7 @@ class BaseSerializerSortedByPosition(serializers.SerializerMethodField):
 
 
 class QuestionOptionSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField()
     question = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
@@ -34,10 +34,6 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
         validated_data['id'] = question_option.id
         return validated_data
 
-    def update(self, instance, validated_data):
-        validated_data['survey'] = Survey.objects.get(id=validated_data['survey'])
-        return super().update(instance, validated_data)
-
     def validate_question(self, value):
         if self._context.get('questionoption_creation', False):
             if value == None:
@@ -54,9 +50,9 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField()
     survey = serializers.IntegerField(write_only=True, required=False, default=None)
-    options = QuestionOptionSerializer(many=True, required=False,)
+    options = QuestionOptionSerializer(many=True, required=False)
 
     class Meta:
         model = Question
@@ -89,6 +85,15 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data['survey'] = Survey.objects.get(id=validated_data['survey'])
+        options = validated_data.pop('options')
+        options_instances = {o.id: o for o in instance.options.all()}
+        for option in options:
+            option_serializer = QuestionOptionSerializer(
+                instance=options_instances.get(option.get('id')),
+                data=option
+            )
+            if option_serializer.is_valid(raise_exception=True):
+                option_serializer.save()
         return super().update(instance, validated_data)
 
     def validate_survey(self, value):
@@ -131,9 +136,22 @@ class SurveySerializer(serializers.ModelSerializer):
                 option_data['id'] = question_option.id
         return validated_data
 
+    def update(self, instance, validated_data):
+        questions = validated_data.pop('questions', [])
+        instance = super(SurveySerializer, self).update(instance, validated_data)
+        question_instances = {q.id: q for q in instance.questions.all()}
+        for question in questions:
+            question.update({'survey': instance.id})
+
+            question_serializer = QuestionSerializer(
+                instance=question_instances.get(question.get('id')), data=question
+            )
+
+            if question_serializer.is_valid(raise_exception=True):
+                question_serializer.save()
+        return instance
+
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response["questions"] = sorted(response.get("questions", []), key=lambda x: x["position"])
         return response
-
-

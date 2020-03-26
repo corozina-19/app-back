@@ -1,9 +1,10 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from diagnosis import models
 from diagnosis.api import serializers
 
 
 class SurveyViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly, ]
     serializer_class = serializers.SurveySerializer
     queryset = models.Survey.objects
 
@@ -14,6 +15,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly, ]
     serializer_class = serializers.QuestionSerializer
     queryset = models.Question.objects
 
@@ -24,6 +26,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 
 class QuestionOptionViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly, ]
     serializer_class = serializers.QuestionOptionSerializer
     queryset = models.QuestionOption.objects
 

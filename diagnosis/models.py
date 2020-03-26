@@ -8,12 +8,18 @@ class Survey(models.Model):
     percentage_acceptance = models.FloatField(default=0)
     total_score = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
 
 class Question(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="questions")
     type = models.IntegerField(choices=QUESTION_TYPE, default=YES_NO_QUESTION)
     statement = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'Survey {self.survey}: {self.statement}'
 
 
 class QuestionOption(models.Model):
