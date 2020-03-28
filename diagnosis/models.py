@@ -28,6 +28,9 @@ class QuestionOption(models.Model):
     text = models.CharField(max_length=150)
     position = models.IntegerField(default=0)
 
+    def __str__(self):
+        return f'Question: {self.question.statement}: {self.text} ({self.value})'
+
 
 class Diagnosis(models.Model):
     patient = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -38,9 +41,16 @@ class Diagnosis(models.Model):
     class Meta:
         verbose_name_plural = "Diagnoses"
 
+    def __str__(self):
+        return f'Survey: {self.survey.name} => Patient: {self.patient.get_full_name()}'
+
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
     answer_text = models.TextField()
     answer_value = models.IntegerField()
+
+    def __str__(self):
+        value = self.answer_value
+        return f'Diagnosis: {self.diagnosis} Question: {self.question.survey} Answer: {self.answer_text} ({value})'
