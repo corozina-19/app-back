@@ -10,7 +10,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['survey_creation'] = True
+        context['read_only'] = self.action in ('retrieve', 'detail')
         return context
 
 
