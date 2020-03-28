@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from diagnosis.models import Survey, Question, QuestionOption
+from diagnosis.models import Survey, Question, QuestionOption, Diagnosis
 
 
 class BaseSerializerSortedByPosition(serializers.SerializerMethodField):
@@ -155,3 +155,18 @@ class SurveySerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response["questions"] = sorted(response.get("questions", []), key=lambda x: x["position"])
         return response
+
+
+class DiagnosisSerializer(serializers.ModelSerializer):
+    disease_warning = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Diagnosis
+        fields = (
+            'disease_warning',
+            'score',
+            'score_percentage',
+        )
+
+    def get_disease_warning(self, diagnosis: Diagnosis):
+        return diagnosis.score_percentage >= diagnosis.survey.percentage_acceptance
