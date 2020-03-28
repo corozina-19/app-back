@@ -3,17 +3,6 @@ from rest_framework import serializers
 from diagnosis.models import Survey, Question, QuestionOption
 
 
-class BaseSerializerSortedByPosition(serializers.SerializerMethodField):
-    def __init__(self, attribute_string, serializer, method_name=None, **kwargs):
-        self.attribute_string = attribute_string
-        self.serializer = serializer
-        super(BaseSerializerSortedByPosition, self).__init__(method_name=method_name, **kwargs)
-
-    def to_representation(self, value):
-        data = getattr(value, self.attribute_string).all().order_by('position')
-        return self.serializer(data, many=True, ).data
-
-
 class QuestionOptionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     question = serializers.IntegerField(write_only=True, required=False)
@@ -28,6 +17,12 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
             'question'
         )
 
+    def __init__(self, *args, **kwargs):
+        safe = kwargs.pop('safe', True)
+        if safe:
+            del self.fields['value']
+        super(QuestionOptionSerializer, self).__init__(*args, **kwargs)
+
     def create(self, validated_data):
         question = Question.objects.get(id=validated_data.pop('question'))
         question_option = QuestionOption.objects.create(question=question, **validated_data)
@@ -36,7 +31,7 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
 
     def validate_question(self, value):
         if self._context.get('questionoption_creation', False):
-            if value == None:
+            if value is None:
                 raise serializers.ValidationError("Question ID Field is required")
             if not Question.objects.filter(id=value):
                 raise serializers.ValidationError(f"Question {value} doesn't exist")
@@ -45,7 +40,8 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         if self._context.get('questionoption_creation', False):
-            response['question'] = int(self._context['request'].data.get('question', getattr(instance, 'question_id', '')))
+            response['question'] = int(
+                self._context['request'].data.get('question', getattr(instance, 'question_id', '')))
         return response
 
 
@@ -65,6 +61,12 @@ class QuestionSerializer(serializers.ModelSerializer):
             'survey',
         )
 
+    def __init__(self, *args, **kwargs):
+        safe = kwargs.pop('safe', True)
+        if safe:
+            options = QuestionOptionSerializer(many=True, required=False, safe=safe)
+        super(QuestionSerializer, self).__init__(*args, **kwargs)
+
     def create(self, validated_data):
         options_data = validated_data.pop('options', [])
         survey = Survey.objects.get(id=validated_data.pop('survey'))
@@ -78,7 +80,13 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["options"] = sorted(response.get("options", []), key=lambda x: x["position"])
+
+        if instance.type != 0:
+            response["options"] = sorted(response.get("options", []), key=lambda x: x["position"])
+        else:
+            # As it's a Yes/No question we expect true/false values on response, no t need to send options
+            response["options"] = []
+
         if self._context.get('question_creation', False):
             response['survey'] = int(self._context['request'].data.get('survey', getattr(instance, 'survey_id', '')))
         return response
@@ -98,7 +106,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def validate_survey(self, value):
         if self._context.get('question_creation', False):
-            if value == None:
+            if value is None:
                 raise serializers.ValidationError("Survey ID Field is required")
             if not Survey.objects.filter(id=value):
                 raise serializers.ValidationError(f"Survey {value} doesn't exist")
@@ -118,6 +126,12 @@ class SurveySerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
         )
+
+    def __init__(self, *args, **kwargs):
+        safe = kwargs.get('context').get('read_only', True)
+        if safe:
+            self.fields['questions'] = QuestionSerializer(many=True, required=False, safe=True)
+        super(SurveySerializer, self).__init__(*args, **kwargs)
 
     def create(self, validated_data):
         survey = Survey(name=validated_data.get("name"))
