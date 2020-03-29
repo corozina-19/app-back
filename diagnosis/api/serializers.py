@@ -190,3 +190,18 @@ class DiagnosisSerializer(serializers.ModelSerializer):
             'patient',
             'survey'
         )
+
+
+class DiagnosisScoredSerializer(serializers.ModelSerializer):
+    disease_warning = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Diagnosis
+        fields = (
+            'disease_warning',
+            'score',
+            'score_percentage',
+        )
+
+    def get_disease_warning(self, diagnosis: Diagnosis):
+        return diagnosis.score_percentage >= diagnosis.survey.percentage_acceptance
