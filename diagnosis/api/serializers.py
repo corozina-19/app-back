@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from diagnosis.models import Survey, Question, QuestionOption
+from diagnosis.models import Survey, Question, QuestionOption, Diagnosis, Answer
 
 
 class QuestionOptionSerializer(serializers.ModelSerializer):
@@ -169,3 +169,24 @@ class SurveySerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response["questions"] = sorted(response.get("questions", []), key=lambda x: x["position"])
         return response
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = (
+            'question',
+            'diagnosis',
+            'answer_text',
+        )
+
+
+class DiagnosisSerializer(serializers.ModelSerializer):
+    answers = AnswerSerializer(source='answers')
+
+    class Meta:
+        model = Diagnosis
+        fields = (
+            'patient',
+            'survey'
+        )

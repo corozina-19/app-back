@@ -34,3 +34,8 @@ class QuestionOptionViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['questionoption_creation'] = True
         return context
+
+
+class DiagnosisViewset(viewsets.ModelViewSet):
+    queryset = models.Diagnosis.objects.all()
+    serializer_class = serializers.DiagnosisSerializer

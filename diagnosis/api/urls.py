@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register('survey', viewsets.SurveyViewSet,)
 router.register('question', viewsets.QuestionViewSet,)
 router.register('question-option', viewsets.QuestionOptionViewSet,)
+router.register('diagnosis', viewsets.DiagnosisViewset)
 
 urlpatterns = [
     path('', include(router.urls)),

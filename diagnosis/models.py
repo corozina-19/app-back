@@ -47,7 +47,7 @@ class Diagnosis(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE, related_name='answers')
     answer_text = models.TextField()
     answer_value = models.IntegerField()
 
