@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from diagnosis.api.fields import MultiTypeResponseField
-from diagnosis.constants import YES_NO_QUESTION
 from diagnosis.models import Survey, Question, QuestionOption, Diagnosis, Answer
 
 
@@ -181,7 +180,6 @@ class AnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = (
             'question',
-            'diagnosis',
             'answer_text',
         )
 
@@ -235,10 +233,11 @@ class DiagnosisSerializer(serializers.ModelSerializer):
         instance = super(DiagnosisSerializer, self).create(validated_data)
         for answer in answers:
             question = answer.pop('question')
+            value = question.options.get(text=answer.get('answer_text')).value
             answer.update({'question': question.id})
             serializer = AnswerSerializer(data=answer)
             serializer.is_valid()
-            serializer.save(diagnosis=instance)
+            serializer.save(diagnosis=instance, answer_value=value)
         return instance
 
 
