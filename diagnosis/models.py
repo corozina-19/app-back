@@ -11,6 +11,15 @@ class Survey(models.Model):
     def __str__(self):
         return self.name
 
+    def calculate_total_score(self):
+        total_score = 0
+        questions = self.questions.all().prefetch_related('options')
+        for question in questions:
+            total_score += max(question.options.all().values_list('value', flat=True))
+
+        self.total_score = total_score
+        self.save()
+
 
 class Question(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="questions")
@@ -30,6 +39,15 @@ class QuestionOption(models.Model):
 
     def __str__(self):
         return f'Question: {self.question.statement}: {self.text} ({self.value})'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        """
+        Only on saving a new Question option for a survey question the total score can change.
+        """
+        super(QuestionOption, self).save(force_insert, force_update, using, update_fields)
+
+        self.question.survey.calculate_total_score()
 
 
 class Diagnosis(models.Model):
