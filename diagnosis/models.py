@@ -33,7 +33,7 @@ class QuestionOption(models.Model):
 
 
 class Diagnosis(models.Model):
-    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    patient = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
     score_percentage = models.FloatField(default=0)
@@ -47,9 +47,9 @@ class Diagnosis(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE, related_name='answers')
     answer_text = models.TextField()
-    answer_value = models.IntegerField()
+    answer_value = models.IntegerField(null=True, blank=True, default=0)
 
     def __str__(self):
         value = self.answer_value
