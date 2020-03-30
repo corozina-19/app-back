@@ -1,5 +1,8 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
+from diagnosis.api.fields import MultiTypeResponseField
+from diagnosis.constants import YES_NO_QUESTION
 from diagnosis.models import Survey, Question, QuestionOption, Diagnosis, Answer
 
 
@@ -172,6 +175,8 @@ class SurveySerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
+    answer_text = MultiTypeResponseField()
+
     class Meta:
         model = Answer
         fields = (
@@ -180,16 +185,61 @@ class AnswerSerializer(serializers.ModelSerializer):
             'answer_text',
         )
 
+        read_only_fields = (
+            'diagnosis',
+        )
+
+    def validate(self, attrs):
+        answer_text = attrs.get('answer_text')
+        question = attrs.get('question')
+        options = question.options.all().values_list('text', flat=True)
+        if answer_text not in options:
+            raise ValidationError(
+                detail={
+                    'answer_text': f"Answer is not in response options, options are {', '.join(options)}"
+                }
+            )
+        return attrs
+
 
 class DiagnosisSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(source='answers')
+    answers = AnswerSerializer(many=True)
+
+    def validate(self, attrs):
+        if not len(attrs['answers']):
+            raise ValidationError("You cannot send a diagnosis without answers")
+        if len(attrs['answers']) != attrs.get('survey').questions.count():
+            raise ValidationError("Answer count does not match survey's question count")
+        return attrs
+
+    def validate_survey(self, survey):
+        if survey.total_score == 0:
+            raise ValidationError('This survey is unable to get response, please contact support')
+        return survey
 
     class Meta:
         model = Diagnosis
         fields = (
+            'id',
             'patient',
-            'survey'
+            'survey',
+            'answers'
         )
+
+        read_only_fields = (
+            'patient',
+        )
+
+    def create(self, validated_data):
+        answers = validated_data.pop('answers')
+        instance = super(DiagnosisSerializer, self).create(validated_data)
+        for answer in answers:
+            question = answer.pop('question')
+            answer.update({'question': question.id})
+            serializer = AnswerSerializer(data=answer)
+            serializer.is_valid()
+            serializer.save(diagnosis=instance)
+        return instance
 
 
 class DiagnosisScoredSerializer(serializers.ModelSerializer):
