@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'diagnosis',
     'firebase',
-    'chat'
+    'chat',
+    'userprofile',
 ]
 
 MIDDLEWARE = [
