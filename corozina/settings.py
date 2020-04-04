@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_celery_beat',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
     'diagnosis',
     'firebase',
     'chat',
@@ -85,6 +88,13 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+    # django-rest-framework-social-oauth2
+   'rest_framework_social_oauth2.backends.DjangoOAuth2',
+   # Django
+   'django.contrib.auth.backends.ModelBackend',
+)
 
 
 # Password validation
