@@ -8,3 +8,4 @@ requests==2.23.0
 six==1.14.0
 celery==4.4.2
 django-celery-beat==2.0.0
+djangorestframework-simplejwt==4.4.0
