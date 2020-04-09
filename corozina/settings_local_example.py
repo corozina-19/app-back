@@ -53,3 +53,6 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ]
 }
+# Facebook configuration
+SOCIAL_AUTH_FACEBOOK_KEY = '<your app id goes here>'
+SOCIAL_AUTH_FACEBOOK_SECRET = '<your app secret goes here>'
