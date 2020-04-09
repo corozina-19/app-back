@@ -17,12 +17,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from auth.views import CustomTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(f'api/{settings.CURRENT_API_VERSION}/auth/', include('auth.urls')),
     path(f'api/{settings.CURRENT_API_VERSION}/', include('diagnosis.urls')),
     path(f'api/{settings.CURRENT_API_VERSION}/chat/', include('chat.urls')),
+    path(f'api/{settings.CURRENT_API_VERSION}/auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(f'api/{settings.CURRENT_API_VERSION}/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 
