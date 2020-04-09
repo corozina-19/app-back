@@ -20,7 +20,6 @@ from django.conf.global_settings import SECRET_KEY
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = False
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -43,10 +41,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_celery_beat',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
     'diagnosis',
     'firebase',
     'chat',
     'auth.apps.AuthConfig',
+    'chat',
+    'userprofile',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'corozina.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -91,6 +93,15 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = (
+    # Facebook OAuth2
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    # django-rest-framework-social-oauth2
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Password validation
 
@@ -222,6 +233,12 @@ SOCIAL_LOGIN_TOKEN = 'HTTP_SOCIAL_LOGIN_TOKEN'
 
 # API settings
 CURRENT_API_VERSION = 'v1'
+
+# Facebook settings
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email'
+}
 
 try:
     exec(open(os.path.join(BASE_DIR, 'corozina/settings_local.py')).read())
