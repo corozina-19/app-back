@@ -8,6 +8,7 @@ from chat.api import viewsets as api_views
 
 router = DefaultRouter()
 router.register('message', api_views.MessageViewSet, basename='message')
+router.register('thread', api_views.ThreadViewSet, basename='thread')
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -1,15 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
+from chat.choices import STATUS_CHOICES
 
 
 class Thread(models.Model):
     """Model used to manage a chat thread"""
-
-    STATUS_CHOICES = (
-        ('open', 'Open'),
-        ('taken', 'Taken'),
-        ('closed', 'Closed'),
-    )
 
     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient')
     doctor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='doctor')
@@ -18,8 +13,9 @@ class Thread(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, default='open', max_length=25)
 
     def __str__(self):
-        return f'status: {self.get_status_display} user: {self.user.get_full_name()} ' \
-               f'doctor: {self.doctor.get_full_name()}'
+        return f'status: {self.get_status_display()} ' \
+               f'- patient: {self.patient.get_full_name() if self.patient.get_full_name() else self.patient.username} '\
+               f'- doctor: {(self.doctor.get_full_name() if self.doctor.get_full_name() else self.doctor.username) if self.doctor else None}'
 
     class Meta:
         ordering = ['last_update']
@@ -37,4 +33,3 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['creation_date']
-
